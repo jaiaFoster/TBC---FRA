@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Friend Reminder",
+    "slug": "friend-reminder",
+    "scheme": "friendreminder",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.friendreminder.mvp"
+    },
+    "android": {
+      "package": "com.friendreminder.mvp"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-notifications"
+    ],
+    "extra": {
+      "privacyFirst": true
+    }
+  }
+}
