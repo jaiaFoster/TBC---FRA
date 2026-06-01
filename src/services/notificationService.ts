@@ -3,8 +3,7 @@ import { debugLogger } from "@/debug/debugLogger";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
+    shouldShowAlert: true,
     shouldPlaySound: false,
     shouldSetBadge: false
   })
