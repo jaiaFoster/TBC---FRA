@@ -1,5 +1,6 @@
 import { clearFriends, createFriend } from "@/repositories/friendRepository";
 import { clearSettings, saveSettings, defaultSettings } from "@/repositories/settingsRepository";
+import { clearAnonymousDeviceId } from "@/services/deviceIdentityService";
 import { logInteraction } from "@/services/interactionLogService";
 import { addDays, isoNow, startOfLocalDay } from "@/utils/dateUtils";
 
@@ -46,6 +47,7 @@ export async function seedDebugData(): Promise<void> {
 export async function clearAllLocalData(): Promise<void> {
   await clearFriends();
   await clearSettings();
+  await clearAnonymousDeviceId();
   await saveSettings(defaultSettings);
 }
 

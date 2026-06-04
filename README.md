@@ -8,9 +8,21 @@ Friend Reminder is a privacy-first Expo + React Native + TypeScript MVP for manu
 npm install
 ```
 
-This project was scaffolded with current Expo packages. On this machine, npm warned that the newest React Native/Expo packages prefer Node `20.19.4` or newer while the local Node version is `20.11.1`. If Expo start fails, update Node first.
+The project is pinned to Expo SDK 52 with React Native 0.76.9 and React 18.3.1. The original upload used `"latest"` dependency ranges, which can pull newer Expo/React Native versions that require Node `20.19.4+`. These pinned versions were verified locally on Node `20.11.1`.
+
+If npm fails because of a local cache permission issue, install with a project-local cache:
+
+```sh
+npm install --cache ./work/npm-cache
+```
 
 ## Run On iPhone
+
+Create a local `.env` file first:
+
+```env
+EXPO_PUBLIC_API_BASE_URL=https://your-hosted-django-backend.example.com
+```
 
 ```sh
 npm start
@@ -18,14 +30,51 @@ npm start
 
 Then scan the QR code with Expo Go on your iPhone. Use the same Wi-Fi network for the Mac and iPhone.
 
+## Run In A Browser
+
+```sh
+npm run web
+```
+
+The browser preview uses a small `database.web.ts` localStorage fallback so the UI can be inspected locally. iOS and Android still use `expo-sqlite`.
+
 ## Debug Data
 
 Open `Settings` in development and use:
 
+- `Test Backend Health` to call `GET /api/health/`.
+- `Register Device` to create/update the anonymous device record.
+- `Send Test Event` to post a debug analytics event.
+- `Show API Base URL` to confirm the app is pointed at the hosted backend.
+- `Show Device ID` to inspect the stable anonymous device ID stored on the device.
 - `Seed Sample Data` for recently contacted, due soon, overdue, and never-contacted friends.
 - `Schedule Debug Notification` for a local notification about 10 seconds later.
 - `Log Pending Notifications` to print scheduled notifications to the console.
 - `Clear Local Data` to reset SQLite friend/log data and local settings.
+
+## Hosted Backend MVP
+
+The app remains local-first with SQLite, but it can now send best-effort MVP data to a hosted Django API. Backend failures are logged in development and should not block local app actions.
+
+Required backend routes:
+
+- `GET /api/health/`
+- `POST /api/devices/`
+- `POST /api/friends/`
+- `PATCH /api/friends/<id>/`
+- `POST /api/friends/<id>/interactions/`
+- `DELETE /api/interactions/<id>/`
+- `POST /api/events/`
+
+Expected hosted backend setup:
+
+- Public HTTPS URL.
+- Postgres configured with `DATABASE_URL`.
+- Secrets such as `SECRET_KEY`, `DEBUG`, and `ALLOWED_HOSTS` loaded from environment variables.
+- CORS enabled for Expo/mobile testing as needed.
+- No committed `db.sqlite3` or backend credentials.
+
+The Expo app only stores the backend URL in `EXPO_PUBLIC_API_BASE_URL`. Do not put secrets in Expo public env vars.
 
 ## What Is Implemented
 
@@ -42,13 +91,16 @@ Open `Settings` in development and use:
   - otherwise: `good`
 - Local notification permission request from user action.
 - Stable friend reminder/debug notification IDs.
+- Stable anonymous device ID stored locally.
+- Best-effort backend calls for friend create/edit/archive, interaction log/delete, health testing, device registration, and debug events.
 - Development-only seed, clear-data, and notification debug tools.
 
 ## Intentionally Not Implemented
 
-- No backend.
 - No accounts.
 - No cloud sync.
+- No full auth.
+- No two-way sync or conflict resolution.
 - No contacts import.
 - No iMessage, SMS, call history, WhatsApp, Discord, Messenger, or private communication reading.
 - No raw communication metadata from private apps.
@@ -67,4 +119,12 @@ Daily summary settings exist in the MVP UI, but the first pass focuses schedulin
 8. Delete the latest interaction and confirm `lastContactedAt` recalculates.
 9. Request notification permission from Settings.
 10. Schedule the debug notification.
-11. Restart the app and confirm data/settings persist.
+11. Confirm hosted backend `/api/health/` opens from the iPhone browser.
+12. Add `EXPO_PUBLIC_API_BASE_URL` to `.env`.
+13. Open Settings and tap `Test Backend Health`.
+14. Tap `Register Device` and `Send Test Event`.
+15. Add a friend and confirm the backend database receives it.
+16. Log an interaction and confirm the backend database receives it.
+17. Archive a friend and confirm the backend record updates.
+18. Temporarily break the backend URL and confirm local app actions still work.
+19. Restart the app and confirm data/settings persist.

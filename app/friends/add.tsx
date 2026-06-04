@@ -7,6 +7,7 @@ import { createFriend } from "@/repositories/friendRepository";
 import { getSettings } from "@/repositories/settingsRepository";
 import { logInteraction } from "@/services/interactionLogService";
 import { rescheduleFriendReminders } from "@/services/reminderScheduler";
+import { syncFriendCreated } from "@/services/backendSyncService";
 import { isoToday } from "@/utils/dateUtils";
 
 export default function AddFriendScreen() {
@@ -18,6 +19,7 @@ export default function AddFriendScreen() {
   }, []);
 
   async function save(values: FriendFormValues) {
+    const today = isoToday();
     const friend = await createFriend({
       name: values.name,
       notes: values.notes,
@@ -25,10 +27,11 @@ export default function AddFriendScreen() {
       preferredInteractionType: values.preferredInteractionType
     });
     if (values.setLastContactedToday) {
-      await logInteraction({ friendId: friend.id, interactionType: values.preferredInteractionType, date: isoToday(), notes: "Initial contact." });
+      await logInteraction({ friendId: friend.id, interactionType: values.preferredInteractionType, date: today, notes: "Initial contact." });
     } else {
       await rescheduleFriendReminders(friend);
     }
+    syncFriendCreated(values.setLastContactedToday ? { ...friend, lastContactedAt: today } : friend);
     router.replace(`/friends/${friend.id}`);
   }
 

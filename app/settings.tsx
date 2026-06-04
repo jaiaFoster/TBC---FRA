@@ -6,6 +6,8 @@ import { Screen } from "@/components/Screen";
 import { AppSettings, getSettings, saveSettings } from "@/repositories/settingsRepository";
 import { clearAllLocalData, seedDebugData } from "@/debug/debugSeedService";
 import { getPendingNotifications, getPermissionStatus, requestNotificationPermission, scheduleDebugNotification } from "@/services/notificationService";
+import { getApiBaseUrl, registerDevice, sendTestEvent, testBackendHealth } from "@/services/backendSyncService";
+import { getAnonymousDeviceId } from "@/services/deviceIdentityService";
 import { rescheduleAllFriendReminders } from "@/services/reminderScheduler";
 import { colors } from "@/theme/colors";
 
@@ -53,6 +55,20 @@ export default function SettingsScreen() {
       {__DEV__ && (
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Development Debug</Text>
+          <PrimaryButton tone="secondary" onPress={async () => {
+            const result = await testBackendHealth();
+            Alert.alert(result.ok ? "Backend healthy" : "Backend unavailable", result.ok ? "Health check succeeded." : result.error ?? "Health check failed.");
+          }}>Test Backend Health</PrimaryButton>
+          <PrimaryButton tone="secondary" onPress={async () => {
+            const result = await registerDevice();
+            Alert.alert(result.ok ? "Device registered" : "Register failed", result.ok ? "Anonymous device sent to backend." : result.error ?? "Register failed.");
+          }}>Register Device</PrimaryButton>
+          <PrimaryButton tone="secondary" onPress={async () => {
+            const result = await sendTestEvent();
+            Alert.alert(result.ok ? "Event sent" : "Event failed", result.ok ? "Debug event sent to backend." : result.error ?? "Event failed.");
+          }}>Send Test Event</PrimaryButton>
+          <PrimaryButton tone="secondary" onPress={() => Alert.alert("API base URL", getApiBaseUrl())}>Show API Base URL</PrimaryButton>
+          <PrimaryButton tone="secondary" onPress={async () => Alert.alert("Anonymous Device ID", await getAnonymousDeviceId())}>Show Device ID</PrimaryButton>
           <PrimaryButton tone="secondary" onPress={async () => { await seedDebugData(); Alert.alert("Seeded", "Sample friends and logs were created."); }}>Seed Sample Data</PrimaryButton>
           <PrimaryButton tone="secondary" onPress={async () => { await scheduleDebugNotification(); Alert.alert("Scheduled", "Debug notification will fire in about 10 seconds."); }}>Schedule Debug Notification</PrimaryButton>
           <PrimaryButton tone="secondary" onPress={async () => { const pending = await getPendingNotifications(); Alert.alert("Pending notifications", `${pending.length} scheduled. Details are in the console.`); }}>Log Pending Notifications</PrimaryButton>

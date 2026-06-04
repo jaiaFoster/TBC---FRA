@@ -5,6 +5,7 @@ import {
   getMostRecentLogDate,
   InteractionLogInput
 } from "@/repositories/interactionLogRepository";
+import { syncInteractionDeleted, syncInteractionLogged } from "./backendSyncService";
 import { rescheduleFriendReminders } from "./reminderScheduler";
 
 export async function logInteraction(input: InteractionLogInput) {
@@ -17,11 +18,13 @@ export async function logInteraction(input: InteractionLogInput) {
     }
     await rescheduleFriendReminders({ ...friend, lastContactedAt: friend.lastContactedAt });
   }
+  syncInteractionLogged(input.friendId, log);
   return log;
 }
 
 export async function deleteInteractionAndRecalculate(friendId: string, logId: string): Promise<void> {
   await deleteInteractionLog(logId);
+  syncInteractionDeleted(logId, friendId);
   const latestDate = await getMostRecentLogDate(friendId);
   await updateLastContactedAt(friendId, latestDate);
   const friend = await getFriend(friendId);

@@ -1,10 +1,10 @@
 import * as Notifications from "expo-notifications";
 import { debugLogger } from "@/debug/debugLogger";
+import { trackEventBestEffort } from "./backendSyncService";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
+    shouldShowAlert: true,
     shouldPlaySound: false,
     shouldSetBadge: false
   })
@@ -25,6 +25,7 @@ export async function getPermissionStatus(): Promise<Notifications.PermissionSta
 export async function requestNotificationPermission(): Promise<Notifications.PermissionStatus> {
   const permissions = await Notifications.requestPermissionsAsync();
   debugLogger.info("notifications", "Permission requested", permissions);
+  trackEventBestEffort("notification_permission_requested", { status: permissions.status });
   return permissions.status;
 }
 

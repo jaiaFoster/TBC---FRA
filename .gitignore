@@ -1,0 +1,7 @@
+node_modules/
+.expo/
+dist/
+npm-debug.log*
+work/npm-cache/
+FriendReminder_GitHub_Upload_Ready/
+FriendReminder_GitHub_Upload_Ready.zip
