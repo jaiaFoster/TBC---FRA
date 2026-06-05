@@ -21,7 +21,7 @@ npm install --cache ./work/npm-cache
 Create a local `.env` file first:
 
 ```env
-EXPO_PUBLIC_API_BASE_URL=https://your-hosted-django-backend.example.com
+EXPO_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
 ```
 
 ```sh
@@ -29,6 +29,14 @@ npm start
 ```
 
 Then scan the QR code with Expo Go on your iPhone. Use the same Wi-Fi network for the Mac and iPhone.
+
+For a physical iPhone, `127.0.0.1` points at the phone, not the Mac. Use the Mac LAN IP instead:
+
+```env
+EXPO_PUBLIC_API_BASE_URL=http://192.168.x.x:8000
+```
+
+Start Django with `python frapi/manage.py runserver 0.0.0.0:8000` and include the Mac LAN IP in backend `ALLOWED_HOSTS`, or use `ALLOWED_HOSTS=*` only for local testing.
 
 ## Run In A Browser
 
@@ -52,9 +60,9 @@ Open `Settings` in development and use:
 - `Log Pending Notifications` to print scheduled notifications to the console.
 - `Clear Local Data` to reset SQLite friend/log data and local settings.
 
-## Hosted Backend MVP
+## Backend MVP
 
-The app remains local-first with SQLite, but it can now send best-effort MVP data to a hosted Django API. Backend failures are logged in development and should not block local app actions.
+The app remains local-first with SQLite, but it can now send best-effort MVP data to Django. Backend failures are logged in development and should not block local app actions.
 
 Required backend routes:
 
@@ -66,10 +74,11 @@ Required backend routes:
 - `DELETE /api/interactions/<id>/`
 - `POST /api/events/`
 
-Expected hosted backend setup:
+Expected backend setup:
 
-- Public HTTPS URL.
-- Postgres configured with `DATABASE_URL`.
+- Local proof-of-concept URL such as `http://127.0.0.1:8000`.
+- For hosted testing, a public HTTPS URL.
+- Postgres configured with `DATABASE_URL` for hosted deployments.
 - Secrets such as `SECRET_KEY`, `DEBUG`, and `ALLOWED_HOSTS` loaded from environment variables.
 - CORS enabled for Expo/mobile testing as needed.
 - No committed `db.sqlite3` or backend credentials.
@@ -119,7 +128,7 @@ Daily summary settings exist in the MVP UI, but the first pass focuses schedulin
 8. Delete the latest interaction and confirm `lastContactedAt` recalculates.
 9. Request notification permission from Settings.
 10. Schedule the debug notification.
-11. Confirm hosted backend `/api/health/` opens from the iPhone browser.
+11. Confirm backend `/api/health/` opens from the simulator/browser. For iPhone, use the Mac LAN IP.
 12. Add `EXPO_PUBLIC_API_BASE_URL` to `.env`.
 13. Open Settings and tap `Test Backend Health`.
 14. Tap `Register Device` and `Send Test Event`.
