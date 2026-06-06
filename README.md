@@ -8,7 +8,7 @@ Friend Reminder is a privacy-first Expo + React Native + TypeScript MVP for manu
 npm install
 ```
 
-The project uses Expo SDK 55 with React Native 0.83.6 and React 19.2.0. Use Node `20.19.4` or newer. SDK 55 is the newest version supported by Expo Go from Apple's App Store; Expo Go for SDK 56 is not currently available there.
+The project uses Expo SDK 54 with React Native 0.81.5 and React 19.1.0. Use Node `20.19.4` or newer. Expo's May 2026 App Store notice says SDK 54 remains the version supported by Expo Go from Apple's App Store while newer versions await approval.
 
 If npm fails because of a local cache permission issue, install with a project-local cache:
 
