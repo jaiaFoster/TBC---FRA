@@ -9,6 +9,7 @@ import { Friend } from "@/models/friend";
 import { InteractionLog, interactionTypeLabels } from "@/models/interactionLog";
 import { archiveFriend, getFriend } from "@/repositories/friendRepository";
 import { listLogsForFriend } from "@/repositories/interactionLogRepository";
+import { syncFriendUpdated } from "@/services/backendSyncService";
 import { calculateFriendStatus } from "@/services/friendStatusService";
 import { deleteInteractionAndRecalculate, logInteraction } from "@/services/interactionLogService";
 import { cancelFriendReminders } from "@/services/reminderScheduler";
@@ -40,6 +41,7 @@ export default function FriendDetailScreen() {
     if (!friend) return;
     await archiveFriend(friend.id);
     await cancelFriendReminders(friend.id);
+    syncFriendUpdated({ ...friend, isArchived: true });
     router.replace("/");
   }
 

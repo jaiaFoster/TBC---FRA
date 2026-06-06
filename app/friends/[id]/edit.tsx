@@ -5,6 +5,7 @@ import { FriendForm, FriendFormValues } from "@/components/FriendForm";
 import { Screen } from "@/components/Screen";
 import { Friend } from "@/models/friend";
 import { getFriend, updateFriend } from "@/repositories/friendRepository";
+import { syncFriendUpdated } from "@/services/backendSyncService";
 import { rescheduleFriendReminders } from "@/services/reminderScheduler";
 
 export default function EditFriendScreen() {
@@ -27,6 +28,7 @@ export default function EditFriendScreen() {
     };
     await updateFriend(updated);
     await rescheduleFriendReminders(updated);
+    syncFriendUpdated(updated);
     router.replace(`/friends/${friend.id}`);
   }
 
