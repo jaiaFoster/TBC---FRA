@@ -25,7 +25,7 @@ EXPO_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
 ```
 
 ```sh
-npm start
+npx expo start -c
 ```
 
 Then scan the QR code with Expo Go on your iPhone. Use the same Wi-Fi network for the Mac and iPhone.
@@ -37,6 +37,8 @@ EXPO_PUBLIC_API_BASE_URL=http://192.168.x.x:8000
 ```
 
 Start Django with `python frapi/manage.py runserver 0.0.0.0:8000` and include the Mac LAN IP in backend `ALLOWED_HOSTS`, or use `ALLOWED_HOSTS=*` only for local testing.
+
+For the complete physical-device proof, follow [IPHONE_BACKEND_TEST.md](IPHONE_BACKEND_TEST.md).
 
 ## Run In A Browser
 
@@ -116,9 +118,11 @@ The Expo app only stores the backend URL in `EXPO_PUBLIC_API_BASE_URL`. Do not p
 
 Daily summary settings exist in the MVP UI, but the first pass focuses scheduling on friend reminders and debug notifications.
 
+Backend sync is currently one-way and best-effort. There is no retry queue, persistent sync status, authentication, two-way sync, or conflict resolution.
+
 ## Manual Test Checklist
 
-1. Launch the app with `npm start`.
+1. Launch the app with `npx expo start -c`.
 2. Confirm SQLite initializes without errors.
 3. Seed sample data from Settings.
 4. Confirm dashboard counts look correct.
