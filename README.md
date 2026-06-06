@@ -8,7 +8,7 @@ Friend Reminder is a privacy-first Expo + React Native + TypeScript MVP for manu
 npm install
 ```
 
-The project is pinned to Expo SDK 52 with React Native 0.76.9 and React 18.3.1. The original upload used `"latest"` dependency ranges, which can pull newer Expo/React Native versions that require Node `20.19.4+`. These pinned versions were verified locally on Node `20.11.1`.
+The project uses Expo SDK 56 with React Native 0.85.3 and React 19.2.3. Use Node `20.19.4` or newer. Physical iPhones can only install the latest Expo Go, so keeping the project on the current Expo SDK is required for Expo Go testing.
 
 If npm fails because of a local cache permission issue, install with a project-local cache:
 
