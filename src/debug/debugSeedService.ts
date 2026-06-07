@@ -1,4 +1,5 @@
 import { clearFriends, createFriend } from "@/repositories/friendRepository";
+import { getDatabase } from "@/db/database";
 import { clearSettings, saveSettings, defaultSettings } from "@/repositories/settingsRepository";
 import { clearAnonymousDeviceId } from "@/services/deviceIdentityService";
 import { logInteraction } from "@/services/interactionLogService";
@@ -9,6 +10,7 @@ function dayOffset(days: number): string {
 }
 
 export async function seedDebugData(): Promise<void> {
+  await getDatabase();
   await clearFriends();
 
   const recent = await createFriend({
@@ -45,6 +47,7 @@ export async function seedDebugData(): Promise<void> {
 }
 
 export async function clearAllLocalData(): Promise<void> {
+  await getDatabase();
   await clearFriends();
   await clearSettings();
   await clearAnonymousDeviceId();

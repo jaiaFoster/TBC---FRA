@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text } from "react-native";
 import { FriendForm, FriendFormValues } from "@/components/FriendForm";
+import { PrimaryButton } from "@/components/PrimaryButton";
 import { Screen } from "@/components/Screen";
 import { createFriend } from "@/repositories/friendRepository";
 import { getSettings } from "@/repositories/settingsRepository";
@@ -38,6 +39,7 @@ export default function AddFriendScreen() {
   return (
     <Screen>
       <Text style={{ fontSize: 28, fontWeight: "900" }}>Add Friend</Text>
+      <PrimaryButton tone="secondary" onPress={() => router.push("/friends/import-contacts")}>Choose from Contacts</PrimaryButton>
       <FriendForm defaultCadenceDays={defaultCadenceDays} showTodayToggle onSubmit={save} />
     </Screen>
   );

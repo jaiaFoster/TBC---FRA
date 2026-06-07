@@ -14,10 +14,12 @@ import { colors } from "@/theme/colors";
 export default function SettingsScreen() {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [permission, setPermission] = useState<string>("unknown");
+  const [deviceId, setDeviceId] = useState<string>("Loading...");
 
   const load = useCallback(async () => {
     setSettings(await getSettings());
     setPermission(await getPermissionStatus());
+    setDeviceId(await getAnonymousDeviceId());
   }, []);
   useFocusEffect(useCallback(() => void load(), [load]));
 
@@ -55,6 +57,8 @@ export default function SettingsScreen() {
       {__DEV__ && (
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Development Debug</Text>
+          <Text style={styles.meta}>API base URL: {getApiBaseUrl()}</Text>
+          <Text style={styles.meta}>Anonymous device ID: {deviceId}</Text>
           <PrimaryButton tone="secondary" onPress={async () => {
             const result = await testBackendHealth();
             Alert.alert(result.ok ? "Backend healthy" : "Backend unavailable", result.ok ? "Health check succeeded." : result.error ?? "Health check failed.");

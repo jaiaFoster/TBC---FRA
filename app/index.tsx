@@ -36,6 +36,7 @@ export default function DashboardScreen() {
 
       <DashboardSummary friends={friends} />
       <PrimaryButton onPress={() => router.push("/friends/add")}>Add Friend</PrimaryButton>
+      <PrimaryButton tone="secondary" onPress={() => router.push("/friends/import-contacts")}>Import from Contacts</PrimaryButton>
       <PrimaryButton tone="secondary" onPress={() => router.push("/friends")}>All Friends</PrimaryButton>
 
       {friends.length === 0 ? (

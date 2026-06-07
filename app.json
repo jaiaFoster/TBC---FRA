@@ -17,7 +17,13 @@
       "expo-router",
       "expo-sqlite",
       "expo-notifications",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Friend Reminder uses contacts only to let you select friends to add."
+        }
+      ]
     ],
     "extra": {
       "privacyFirst": true
