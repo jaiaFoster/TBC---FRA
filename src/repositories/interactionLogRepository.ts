@@ -1,4 +1,4 @@
-import { getDatabase } from "@/db/database";
+import { getDatabase, runDatabaseOperation } from "@/db/database";
 import { debugLogger } from "@/debug/debugLogger";
 import { InteractionLog, InteractionType } from "@/models/interactionLog";
 import { isoNow } from "@/utils/dateUtils";
@@ -12,15 +12,15 @@ export type InteractionLogInput = {
 };
 
 export async function listLogsForFriend(friendId: string): Promise<InteractionLog[]> {
-  const db = await getDatabase();
-  return db.getAllAsync<InteractionLog>(
-    "SELECT * FROM interaction_logs WHERE friendId = ? ORDER BY date DESC, createdAt DESC",
-    friendId
+  return runDatabaseOperation("list interaction logs", (db) =>
+    db.getAllAsync<InteractionLog>(
+      "SELECT * FROM interaction_logs WHERE friendId = ? ORDER BY date DESC, createdAt DESC",
+      friendId
+    )
   );
 }
 
 export async function createInteractionLog(input: InteractionLogInput): Promise<InteractionLog> {
-  const db = await getDatabase();
   const log: InteractionLog = {
     id: createId("log"),
     friendId: input.friendId,
@@ -30,15 +30,17 @@ export async function createInteractionLog(input: InteractionLogInput): Promise<
     createdAt: isoNow()
   };
   debugLogger.info("interactionLogRepository", "Creating interaction log", log);
-  await db.runAsync(
-    `INSERT INTO interaction_logs (id, friendId, interactionType, date, notes, createdAt)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    log.id,
-    log.friendId,
-    log.interactionType,
-    log.date,
-    log.notes,
-    log.createdAt
+  await runDatabaseOperation("create interaction log", (db) =>
+    db.runAsync(
+      `INSERT INTO interaction_logs (id, friendId, interactionType, date, notes, createdAt)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      log.id,
+      log.friendId,
+      log.interactionType,
+      log.date,
+      log.notes,
+      log.createdAt
+    )
   );
   return log;
 }

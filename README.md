@@ -36,6 +36,16 @@ For a physical iPhone, `127.0.0.1` points at the phone, not the Mac. Use the Mac
 EXPO_PUBLIC_API_BASE_URL=http://192.168.x.x:8000
 ```
 
+Settings -> Development Debug shows the exact API base URL, anonymous device ID, and attempted health URL when a request fails. Backend failures are logged and remain non-blocking; local friend and interaction actions continue to use SQLite.
+
+## Local database startup
+
+The app shows `Preparing local database...` while SQLite opens and migrations create the `friends` and `interaction_logs` tables. Routes and sample-data seeding wait for that initialization to finish, so screens never query tables before migrations complete.
+
+## Import from Contacts
+
+Use **Import from Contacts** on the Dashboard or All Friends screen, or **Choose from Contacts** on Add Friend. The app requests contacts permission, reads names only, and imports only the contacts you explicitly select. Exact duplicate normalized names are skipped. Phone numbers, email addresses, and the full address book are not uploaded.
+
 Start Django with `python frapi/manage.py runserver 0.0.0.0:8000` and include the Mac LAN IP in backend `ALLOWED_HOSTS`, or use `ALLOWED_HOSTS=*` only for local testing.
 
 For the complete physical-device proof, follow [IPHONE_BACKEND_TEST.md](IPHONE_BACKEND_TEST.md).

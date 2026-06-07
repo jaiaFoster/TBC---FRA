@@ -110,3 +110,12 @@ const webDb = {
 export async function getDatabase() {
   return webDb;
 }
+
+export async function runDatabaseOperation<T>(label: string, operation: (db: typeof webDb) => Promise<T>): Promise<T> {
+  try {
+    return await operation(webDb);
+  } catch (error) {
+    debugLogger.error("db", `Web database operation failed: ${label}`, error);
+    throw error;
+  }
+}

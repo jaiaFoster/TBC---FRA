@@ -1,4 +1,4 @@
-import { getDatabase } from "@/db/database";
+import { getDatabase, runDatabaseOperation } from "@/db/database";
 import { debugLogger } from "@/debug/debugLogger";
 import { Friend, FriendInput } from "@/models/friend";
 import { createId } from "@/utils/id";
@@ -11,21 +11,22 @@ function mapFriend(row: FriendRow): Friend {
 }
 
 export async function listFriends(includeArchived = false): Promise<Friend[]> {
-  const db = await getDatabase();
-  const rows = await db.getAllAsync<FriendRow>(
-    `SELECT * FROM friends ${includeArchived ? "" : "WHERE isArchived = 0"} ORDER BY name COLLATE NOCASE ASC`
-  );
-  return rows.map(mapFriend);
+  return runDatabaseOperation("list friends", async (db) => {
+    const rows = await db.getAllAsync<FriendRow>(
+      `SELECT * FROM friends ${includeArchived ? "" : "WHERE isArchived = 0"} ORDER BY name COLLATE NOCASE ASC`
+    );
+    return rows.map(mapFriend);
+  });
 }
 
 export async function getFriend(id: string): Promise<Friend | null> {
-  const db = await getDatabase();
-  const row = await db.getFirstAsync<FriendRow>("SELECT * FROM friends WHERE id = ?", id);
-  return row ? mapFriend(row) : null;
+  return runDatabaseOperation("get friend", async (db) => {
+    const row = await db.getFirstAsync<FriendRow>("SELECT * FROM friends WHERE id = ?", id);
+    return row ? mapFriend(row) : null;
+  });
 }
 
 export async function createFriend(input: FriendInput): Promise<Friend> {
-  const db = await getDatabase();
   const friend: Friend = {
     id: createId("friend"),
     name: input.name.trim(),
@@ -37,17 +38,19 @@ export async function createFriend(input: FriendInput): Promise<Friend> {
     isArchived: false
   };
   debugLogger.info("friendRepository", "Creating friend", friend);
-  await db.runAsync(
-    `INSERT INTO friends (id, name, notes, createdAt, lastContactedAt, cadenceDays, preferredInteractionType, isArchived)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    friend.id,
-    friend.name,
-    friend.notes,
-    friend.createdAt,
-    friend.lastContactedAt,
-    friend.cadenceDays,
-    friend.preferredInteractionType,
-    0
+  await runDatabaseOperation("create friend", (db) =>
+    db.runAsync(
+      `INSERT INTO friends (id, name, notes, createdAt, lastContactedAt, cadenceDays, preferredInteractionType, isArchived)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      friend.id,
+      friend.name,
+      friend.notes,
+      friend.createdAt,
+      friend.lastContactedAt,
+      friend.cadenceDays,
+      friend.preferredInteractionType,
+      0
+    )
   );
   return friend;
 }

@@ -15,9 +15,20 @@ function apiUrl(path: string): string {
   return `${base}${cleanPath}`;
 }
 
+function failureDetails(path: string, error: string): string {
+  const attemptedUrl = apiUrl(path);
+  const physicalDeviceWarning = /https?:\/\/(127\.0\.0\.1|localhost)(?::|\/|$)/i.test(API_BASE_URL)
+    ? " Physical iPhone warning: 127.0.0.1 and localhost point to the iPhone, not your Mac. Use your Mac LAN IP or a hosted/tunneled backend URL."
+    : "";
+  return `${error} Attempted URL: ${attemptedUrl}.${physicalDeviceWarning}`;
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<BackendResult<T>> {
   if (!API_BASE_URL) {
-    return { ok: false, error: "EXPO_PUBLIC_API_BASE_URL is not configured." };
+    return {
+      ok: false,
+      error: `EXPO_PUBLIC_API_BASE_URL is empty. Attempted path: ${path}. Configure a reachable backend URL before testing.`
+    };
   }
 
   try {
@@ -32,12 +43,12 @@ async function request<T>(path: string, options?: RequestInit): Promise<BackendR
     const json = (await response.json().catch(() => null)) as BackendResult<T> | null;
 
     if (!response.ok) {
-      return { ok: false, error: json?.error ?? `Backend returned HTTP ${response.status}` };
+      return { ok: false, error: failureDetails(path, json?.error ?? `Backend returned HTTP ${response.status}`) };
     }
 
     return json ?? { ok: true };
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Backend request failed." };
+    return { ok: false, error: failureDetails(path, error instanceof Error ? error.message : "Backend request failed.") };
   }
 }
 

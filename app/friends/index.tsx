@@ -34,6 +34,7 @@ export default function FriendsScreen() {
         <Text style={styles.title}>All Friends</Text>
         <PrimaryButton onPress={() => router.push("/friends/add")} style={styles.addButton}>Add</PrimaryButton>
       </View>
+      <PrimaryButton tone="secondary" onPress={() => router.push("/friends/import-contacts")}>Import from Contacts</PrimaryButton>
       <TextInput style={styles.input} value={search} onChangeText={setSearch} placeholder="Search by name" />
       <View style={styles.filterRow}>
         {filters.map((item) => (

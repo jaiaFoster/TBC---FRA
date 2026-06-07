@@ -11,13 +11,19 @@ async function withDevice<T>(operation: (deviceId: string) => Promise<BackendRes
 }
 
 async function bestEffort<T>(label: string, operation: () => Promise<BackendResult<T>>): Promise<BackendResult<T>> {
-  const result = await operation();
-  if (!result.ok) {
-    debugLogger.warn("backendSync", `${label} failed`, result.error);
-  } else {
-    debugLogger.info("backendSync", `${label} succeeded`);
+  try {
+    const result = await operation();
+    if (!result.ok) {
+      debugLogger.warn("backendSync", `${label} failed`, result.error);
+    } else {
+      debugLogger.info("backendSync", `${label} succeeded`);
+    }
+    return result;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unexpected backend sync failure.";
+    debugLogger.warn("backendSync", `${label} failed`, message);
+    return { ok: false, error: message };
   }
-  return result;
 }
 
 export function syncFriendCreated(friend: Friend): void {
